@@ -1,0 +1,155 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  :root {
+    --background: 210 20% 7%;
+    --foreground: 180 10% 90%;
+
+    --card: 210 18% 10%;
+    --card-foreground: 180 10% 90%;
+
+    --popover: 210 18% 10%;
+    --popover-foreground: 180 10% 90%;
+
+    --primary: 180 65% 50%;
+    --primary-foreground: 210 20% 7%;
+
+    --secondary: 210 15% 15%;
+    --secondary-foreground: 180 10% 85%;
+
+    --muted: 210 12% 14%;
+    --muted-foreground: 210 10% 55%;
+
+    --accent: 175 70% 40%;
+    --accent-foreground: 210 20% 7%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 15% 18%;
+    --input: 210 15% 18%;
+    --ring: 180 65% 50%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 210 18% 8%;
+    --sidebar-foreground: 180 10% 90%;
+    --sidebar-primary: 180 65% 50%;
+    --sidebar-primary-foreground: 210 20% 7%;
+    --sidebar-accent: 210 12% 14%;
+    --sidebar-accent-foreground: 180 10% 85%;
+    --sidebar-border: 210 15% 18%;
+    --sidebar-ring: 180 65% 50%;
+
+    /* Custom tokens */
+    --glow-primary: 180 65% 50%;
+    --glow-accent: 175 70% 40%;
+    --terminal-green: 160 80% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-mono;
+  }
+}
+
+/* Custom animations */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-terminal-blink {
+  animation: terminal-blink 1s step-end infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Terminal prompt style */
+.terminal-prompt::before {
+  content: '$ ';
+  @apply text-primary font-mono;
+}
+
+/* Glow effects */
+.glow-text {
+  text-shadow: 0 0 20px hsl(180 65% 50% / 0.5), 0 0 40px hsl(180 65% 50% / 0.2);
+}
+
+.glow-border {
+  box-shadow: 0 0 15px hsl(180 65% 50% / 0.15), inset 0 0 15px hsl(180 65% 50% / 0.05);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(210 20% 7%);
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(180 65% 50% / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(180 65% 50% / 0.5);
+}
+
+/* XLSX viewer styling */
+.xlsx-viewer table {
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: hsl(var(--foreground));
+}
+.xlsx-viewer td,
+.xlsx-viewer th {
+  border: 1px solid hsl(var(--border));
+  padding: 6px 10px;
+  vertical-align: top;
+  white-space: nowrap;
+}
+.xlsx-viewer tr:first-child td,
+.xlsx-viewer th {
+  background: hsl(var(--primary) / 0.1);
+  color: hsl(var(--primary));
+  font-weight: 600;
+}

@@ -1,0 +1,4 @@
+project_id = "ishlkqkfgnhekgfijweo"
+
+[functions.fetchrss]
+verify_jwt = false
