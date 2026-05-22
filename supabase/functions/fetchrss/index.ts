@@ -6,7 +6,9 @@ const corsHeaders = {
 const RSS_FEEDS: Record<string, string> = {
   "01net": "https://www.01net.com/rss/info/flux-rss/flux-toutes-les-actualites/",
   "clubic": "https://www.clubic.com/feed/news.rss",
+  "developpez": "https://www.developpez.com/index/rss",
   "cnil": "https://www.cnil.fr/fr/rss.xml",
+  "clusif": "https://clusif.fr/feed/",
 };
 
 interface RSSItem {

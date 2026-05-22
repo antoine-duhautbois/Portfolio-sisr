@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
-import { Server, Network, MonitorCog, Shield, Globe, GraduationCap, MapPin, Users, Building, ChevronDown, Terminal, Cpu, HardDrive, Workflow, Newspaper, Scale, ExternalLink, Loader2, Rss, Mail, Linkedin, Github, Send, Menu, X, Code, Database, Lock, Wifi, Monitor, Settings, FileText, Construction } from "lucide-react";
+import { Server, Network, MonitorCog, Shield, Globe, GraduationCap, MapPin, Users, Building, ChevronDown, Terminal, Cpu, HardDrive, Workflow, Newspaper, Scale, ExternalLink, Loader2, Rss, Mail, Linkedin, Github, Send, Menu, X, Code, Database, Lock, Wifi, Monitor, Settings, FileText, Construction, Briefcase } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import heroBg from "@/assets/hero-bg.jpg";
 
@@ -11,6 +11,10 @@ import XlsxViewer from "@/components/XlsxViewer";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import TypingText from "@/components/TypingText";
 import GlitchText from "@/components/GlitchText";
+import DocGestionInterne from "@/pages/DocGestionInterne";
+import DocToolbox from "@/pages/DocToolbox";
+import DocGuacamole from "@/pages/DocGuacamole";
+import DocHaproxy from "@/pages/DocHaproxy";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -60,7 +64,10 @@ const Navbar = () => {
 
   const scrollTo = (item: string) => {
     const id = normalizeId(item);
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    window.dispatchEvent(new CustomEvent("closedoc"));
+    requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    });
     setMobileOpen(false);
   };
 
@@ -432,20 +439,33 @@ const EnterpriseSection = () => (
   </section>
 );
 
-const projects = [
+const projectsEntreprise = [
   {
     icon: FileText,
     title: "Application de Gestion Interne",
     description: "Développement d'un outil interne pour Serenitux centralisant la gestion (fiches atelier, interventions, ventes) et affichant des statistiques. Réalisé en HTML/CSS/JS/Vite pour automatiser et uniformiser les processus.",
     items: ["Centralisation des données", "Automatisation des processus", "Professionnalisation des documents", "Travail en mode projet", "Gain de temps"],
     techs: ["HTML", "CSS", "JavaScript", "Vite"],
+    doc: "/docs/gestion-interne",
   },
+  {
+    icon: MonitorCog,
+    title: "Toolbox — Application portable",
+    description: "Application portable avec interface graphique regroupant des utilitaires système Windows : synchronisation de l'heure via fr.pool.ntp.org, installation rapide d'applications (Firefox, VLC…), personnalisation Windows 11 (barre des tâches à gauche, etc.). Projet en cours de finalisation.",
+    items: ["Interface graphique intuitive", "Synchronisation heure NTP", "Installation d'applications", "Personnalisation Windows 11", "Utilitaires système"],
+    techs: ["C#", ".NET 8", "WPF", "Windows"],
+    doc: "/docs/toolbox",
+  },
+];
+
+const projectsEcole = [
   {
     icon: Lock,
     title: "Accès Distant Sécurisé (Apache Guacamole)",
-    description: "Mise en place d'une solution d'accès distant sécurisé via navigateur web à l'aide d'Apache Guacamole. Implémentation Docker/Linux, configuration des connexions RDP/SSH et intégration de l'authentification Active Directory.",
-    items: ["Accès distant sécurisé", "Virtualisation et conteneurisation (Docker)", "Administration réseau et système", "Gestion de l'authentification (Active Directory)"],
-    techs: ["Apache Guacamole", "Docker", "Linux", "RDP/SSH", "Active Directory"],
+    description: "Mise en place d'une solution d'accès distant sécurisé via navigateur web à l'aide d'Apache Guacamole. Implémentation Proxmox/Linux, configuration des connexions RDP/SSH et intégration de l'authentification Active Directory.",
+    items: ["Accès distant sécurisé", "Virtualisation et conteneurisation (Proxmox)", "Administration réseau et système", "Gestion de l'authentification (Active Directory)"],
+    techs: ["Apache Guacamole", "Proxmox", "Linux", "RDP/SSH", "Active Directory"],
+    doc: "/docs/guacamole",
   },
   {
     icon: Network,
@@ -453,83 +473,91 @@ const projects = [
     description: "Mise en place d'un système de répartition de charge (load balancing) pour optimiser la disponibilité et les performances des services. Installation et configuration d'HAProxy pour distribuer le trafic entre plusieurs serveurs backend.",
     items: ["Mettre à disposition des utilisateurs un service informatique", "Gérer le patrimoine informatique", "Répondre aux incidents et aux demandes d'assistance"],
     techs: ["HAProxy", "Linux", "Load Balancing", "Haute disponibilité"],
-  },
-  {
-    icon: MonitorCog,
-    title: "Toolbox — Application portable",
-    description: "Application portable avec interface graphique regroupant des utilitaires système Windows : synchronisation de l'heure via fr.pool.ntp.org, installation rapide d'applications (Firefox, VLC…), personnalisation Windows 11 (barre des tâches à gauche, etc.). Projet en cours de finalisation.",
-    items: ["Interface graphique intuitive", "Synchronisation heure NTP", "Installation d'applications", "Personnalisation Windows 11", "Utilitaires système"],
-    techs: ["Batch", "PowerShell", "Windows"],
+    doc: "/docs/haproxy",
   },
 ];
+
+type ProjectItem = { icon: typeof FileText; title: string; description: string; items: string[]; techs: string[]; doc?: string };
+const ProjectsGrid = ({ items }: { items: ProjectItem[] }) => (
+  <motion.div
+    className="grid sm:grid-cols-2 gap-6"
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true }}
+    variants={staggerContainer}
+  >
+    {items.map((project, i) => (
+      <motion.div
+        key={project.title}
+        className="bg-card border border-border rounded-lg p-6 glow-border transition-all group relative overflow-hidden"
+        custom={i}
+        variants={scaleIn}
+        whileHover={{ scale: 1.03, y: -8 }}
+      >
+        <motion.div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative z-10">
+          <motion.div whileHover={{ scale: 1.2, y: -4 }} transition={{ duration: 0.3 }}>
+            <project.icon className="w-10 h-10 text-primary mb-4 group-hover:drop-shadow-[0_0_12px_hsl(180_65%_50%/0.6)] transition-all" />
+          </motion.div>
+          <h3 className="font-mono font-bold text-foreground mb-3 text-lg">{project.title}</h3>
+          <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{project.description}</p>
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {project.techs.map((tech) => (
+              <span key={tech} className="text-xs font-mono px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+                {tech}
+              </span>
+            ))}
+          </div>
+          <ul className="space-y-2 mb-5">
+            {project.items.map((item, j) => (
+              <motion.li
+                key={item}
+                className="text-sm text-muted-foreground flex items-center gap-2"
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 + j * 0.08 }}
+              >
+                <motion.span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" whileHover={{ scale: 2 }} />
+                {item}
+              </motion.li>
+            ))}
+          </ul>
+          {(project as { doc?: string }).doc ? (
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("opendoc", { detail: (project as { doc?: string }).doc }))}
+              className="w-full font-mono text-xs px-4 py-2 rounded border border-primary/30 text-primary hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FileText className="w-3.5 h-3.5" /> Documentation →
+            </button>
+          ) : (
+            <button
+              onClick={() => toast.info("Documentation bientôt disponible.", { description: `La documentation pour "${project.title}" sera ajoutée prochainement.` })}
+              className="w-full font-mono text-xs px-4 py-2 rounded border border-primary/30 text-primary hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FileText className="w-3.5 h-3.5" /> Documentation →
+            </button>
+          )}
+        </div>
+      </motion.div>
+    ))}
+  </motion.div>
+);
 
 const ProjectsSection = () => (
   <section id="projets" className="py-24 px-6">
     <div className="max-w-6xl mx-auto">
-      <SectionTitle sub="ls projets/">Projets en Entreprise & en Formation</SectionTitle>
-      <motion.div
-        className="grid md:grid-cols-3 gap-6"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={staggerContainer}
-      >
-        {projects.map((project, i) => (
-          <motion.div
-            key={project.title}
-            className="bg-card border border-border rounded-lg p-6 glow-border transition-all group relative overflow-hidden"
-            custom={i}
-            variants={scaleIn}
-            whileHover={{ scale: 1.03, y: -8 }}
-          >
-            {/* Hover gradient overlay */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            />
-            <div className="relative z-10">
-              <motion.div
-                whileHover={{ scale: 1.2, y: -4 }}
-                transition={{ duration: 0.3 }}
-              >
-                <project.icon className="w-10 h-10 text-primary mb-4 group-hover:drop-shadow-[0_0_12px_hsl(180_65%_50%/0.6)] transition-all" />
-              </motion.div>
-              <h3 className="font-mono font-bold text-foreground mb-3 text-lg">{project.title}</h3>
-              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{project.description}</p>
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {project.techs.map((tech) => (
-                  <span key={tech} className="text-xs font-mono px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
-                    {tech}
-                  </span>
-                ))}
-              </div>
-              <ul className="space-y-2 mb-5">
-                {project.items.map((item, j) => (
-                  <motion.li
-                    key={item}
-                    className="text-sm text-muted-foreground flex items-center gap-2"
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.4 + j * 0.08 }}
-                  >
-                    <motion.span
-                      className="w-1.5 h-1.5 rounded-full bg-primary shrink-0"
-                      whileHover={{ scale: 2 }}
-                    />
-                    {item}
-                  </motion.li>
-                ))}
-              </ul>
-              <button
-                onClick={() => toast.info("Documentation bientôt disponible.", { description: `La documentation pour "${project.title}" sera ajoutée prochainement.` })}
-                className="w-full font-mono text-xs px-4 py-2 rounded border border-primary/30 text-primary hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <FileText className="w-3.5 h-3.5" /> Documentation →
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
+      <SectionTitle sub="ls projets/">Projets</SectionTitle>
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-0 lg:divide-x lg:divide-border">
+        <div className="lg:pr-8">
+          <Briefcase className="w-6 h-6 text-primary mb-4" aria-label="Entreprise" />
+          <ProjectsGrid items={projectsEntreprise} />
+        </div>
+        <div className="lg:pl-8">
+          <GraduationCap className="w-6 h-6 text-primary mb-4" aria-label="Formation" />
+          <ProjectsGrid items={projectsEcole} />
+        </div>
+      </div>
 
       {/* Projet personnel */}
       <div className="mt-16">
@@ -572,12 +600,6 @@ const ProjectsSection = () => (
               >
                 Voir le site →
               </a>
-              <button
-                onClick={() => toast.info("Ce projet n'est pas encore disponible sur GitHub.", { description: "Cause : trouver des solutions pour éviter de dévoiler les clés API (Supabase, etc.)." })}
-                className="font-mono text-xs px-4 py-2 rounded border border-primary/30 text-primary hover:bg-primary/10 transition-colors flex items-center gap-2 cursor-pointer"
-              >
-                <Github className="w-3.5 h-3.5" /> GitHub
-              </button>
             </div>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
@@ -635,10 +657,12 @@ const VEILLE_SOURCES = {
   tech: [
     { key: "01net", name: "01net", url: "https://www.01net.com/", rssUrl: "https://www.01net.com/rss/info/flux-rss/flux-toutes-les-actualites/", items: ["Actualité informatique", "Nouveautés tech", "Matériel & logiciels", "Tendances numériques"] },
     { key: "clubic", name: "Clubic", url: "https://www.clubic.com/", rssUrl: "https://www.clubic.com/feed/news.rss", items: ["Technologie", "Innovations", "Matériel informatique", "Tests & comparatifs"] },
+    { key: "developpez", name: "Developpez.com", url: "https://www.developpez.com/", rssUrl: "https://www.developpez.com/index/rss", items: ["Développement", "Systèmes & réseaux", "Sécurité", "Actualités IT"] },
   ],
   juridique: [
-    { key: "", name: "Legifrance", url: "https://www.legifrance.gouv.fr/", rssUrl: "", items: ["Lois françaises", "Code du numérique", "Réglementation"] },
-    { key: "cnil", name: "CNIL", url: "https://www.cnil.fr/", rssUrl: "https://www.cnil.fr/fr/rss.xml", items: ["RGPD", "Protection des données", "Vie privée"] },
+    { key: "", name: "Legifrance", url: "https://www.legifrance.gouv.fr/", rssUrl: "", items: ["Lois françaises", "Code du numérique", "Réglementation", "Veille législative"] },
+    { key: "cnil", name: "CNIL", url: "https://www.cnil.fr/", rssUrl: "https://www.cnil.fr/fr/rss.xml", items: ["RGPD", "Protection des données", "Vie privée", "Sanctions & contrôles"] },
+    { key: "clusif", name: "Clusif", url: "https://clusif.fr/", rssUrl: "https://clusif.fr/feed/", items: ["Cybersécurité", "Gestion des risques", "Bonnes pratiques SSI"] },
   ],
 };
 
@@ -1014,7 +1038,7 @@ const SkillBar = ({ skill, index }: { skill: typeof SKILLS[0]; index: number }) 
 const SkillsSection = () => (
   <section id="competences" className="py-24 px-6 bg-card/50">
     <div className="max-w-6xl mx-auto">
-      <SectionTitle sub="cat skills.json">Compétences Techniques</SectionTitle>
+      <SectionTitle sub="cat skills.json">Savoir faire</SectionTitle>
       <div className="grid md:grid-cols-2 gap-x-12 gap-y-6">
         {SKILLS.map((skill, i) => (
           <SkillBar key={skill.name} skill={skill} index={i} />
@@ -1029,15 +1053,21 @@ const ContactSection = () => {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
-    // Simulate sending for demo purposes
-    setTimeout(() => {
-      setSending(false);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { error } = await supabase.functions.invoke("send-contact", { body: formData });
+      if (error) throw error;
       setSent(true);
       setFormData({ name: "", email: "", message: "" });
-    }, 1500);
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de l'envoi du message. Réessayez plus tard.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -1188,6 +1218,45 @@ const Footer = () => (
   </footer>
 );
 
+const DocOverlay = () => {
+  const [doc, setDoc] = useState<string | null>(null);
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      setDoc(detail || "/docs/gestion-interne");
+    };
+    const onClose = () => setDoc(null);
+    window.addEventListener("opendoc", onOpen);
+    window.addEventListener("closedoc", onClose);
+    return () => {
+      window.removeEventListener("opendoc", onOpen);
+      window.removeEventListener("closedoc", onClose);
+    };
+  }, []);
+  useEffect(() => {
+    if (doc) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [doc]);
+  if (!doc) return null;
+  const close = () => setDoc(null);
+  return (
+    <div className="fixed inset-0 z-40 bg-background overflow-y-auto pt-16">
+      {doc === "/docs/toolbox" ? (
+        <DocToolbox onClose={close} />
+      ) : doc === "/docs/guacamole" ? (
+        <DocGuacamole onClose={close} />
+      ) : doc === "/docs/haproxy" ? (
+        <DocHaproxy onClose={close} />
+      ) : (
+        <DocGestionInterne onClose={close} />
+      )}
+    </div>
+  );
+};
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -1202,6 +1271,7 @@ const Index = () => {
       <StudiesSection />
       <ContactSection />
       <Footer />
+      <DocOverlay />
     </div>
   );
 };
